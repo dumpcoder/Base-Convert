@@ -3,6 +3,9 @@ package com.example.tomas.base_convert;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputFilter;
+import android.text.InputType;
+import android.text.Spanned;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
@@ -39,7 +42,14 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 base1 = Integer.parseInt(spinner1.getSelectedItem().toString());
-                editText1.setText(base1 + "");
+
+                if(base1 > 10)
+                    editText1.setInputType(InputType.TYPE_CLASS_TEXT);
+
+                else
+                    editText1.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+                editText1.setFilters(new InputFilter[] {getFilter(base1)});
 
             }
 
@@ -54,7 +64,12 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 base2 = Integer.parseInt(spinner2.getSelectedItem().toString());
-                editText2.setText(base2 + "");
+                if(base2 > 10)
+                    editText2.setInputType(InputType.TYPE_CLASS_TEXT);
+                else
+                    editText2.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+                editText2.setFilters(new InputFilter[] {getFilter(base2)});
 
             }
 
@@ -101,5 +116,25 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    public static InputFilter getFilter(final int base)
+    {
+         return new InputFilter() {
+            @Override
+            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+                for(int i = start; i < end; i++)
+                {
+                    char x = source.charAt(i);
+
+                    if(!Character.isDigit(x) && !(x >= 65 && x <= (65+base-11)) && !(x >= 97 && x <= (97+base-11))) {
+
+                        return "";
+                    }
+                }
+
+                return null;
+            }
+        };
     }
 }

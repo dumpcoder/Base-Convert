@@ -15,7 +15,7 @@
         android:layout_marginTop="48dp"
         android:ems="10"
         android:hint="@string/textEditHint"
-        android:inputType="textPersonName"
+        android:inputType="number"
         app:layout_constraintEnd_toStartOf="@+id/spinner1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -39,7 +39,7 @@
         android:layout_marginStart="44dp"
         android:ems="10"
         android:hint="@string/textEditHint"
-        android:inputType="textPersonName"
+        android:inputType="number"
         app:layout_constraintBottom_toBottomOf="@+id/spinner2"
         app:layout_constraintEnd_toStartOf="@+id/spinner2"
         app:layout_constraintStart_toStartOf="parent" />
