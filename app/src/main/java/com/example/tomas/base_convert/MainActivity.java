@@ -15,10 +15,14 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
-    int base1;
-    int base2;
+    int base1 = 0;
+    int base2 = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +47,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
+                //gets previous base selection
+                int prevBase = 0;
+                if(base1 != 0)
+                    prevBase = base1;
+
+
                 base1 = Integer.parseInt(spinner1.getSelectedItem().toString());
 
                 if(base1 > 10)
@@ -52,7 +62,11 @@ public class MainActivity extends AppCompatActivity {
                     editText1.setInputType(InputType.TYPE_CLASS_NUMBER);
 
                 editText1.setFilters(new InputFilter[] {getFilter(base1)});
-                editText1.setText("");
+
+                if(!(editText1.getText().toString().equals("")) && prevBase != 0)
+                {
+                    editText1.setText(baseConvert(editText1.getText().toString(),prevBase,base1));
+                }
 
             }
 
@@ -66,14 +80,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
+                //gets previous base selection
+                int prevBase = 0;
+                if(base2 != 0)
+                    prevBase = base2;
+
                 base2 = Integer.parseInt(spinner2.getSelectedItem().toString());
                 if(base2 > 10)
                     editText2.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
                 else
                     editText2.setInputType(InputType.TYPE_CLASS_NUMBER);
 
+                //adds input filters
                 editText2.setFilters(new InputFilter[] {getFilter(base2)});
-                editText2.setText("");
+
+                if(!(editText2.getText().toString().equals("")) && prevBase != 0)
+                {
+                    editText2.setText(baseConvert(editText2.getText().toString(),prevBase,base2));
+                }
+
 
             }
 
@@ -93,6 +118,11 @@ public class MainActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(getCurrentFocus() == editText1) {
 
+                    if(editText1.getText().toString().equals(""))
+                        editText2.setText("");
+                    else {
+                        editText2.setText(baseConvert(editText1.getText().toString(), base1, base2));
+                    }
                 }
             }
 
@@ -111,7 +141,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(getCurrentFocus() == editText2) {
-
+                    if(editText2.getText().toString().equals(""))
+                        editText1.setText("");
+                    else {
+                        editText1.setText(baseConvert(editText2.getText().toString(), base2, base1));
+                    }
                 }
             }
 
@@ -123,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //function for adding input filter depending on base
-    public static InputFilter getFilter(final int base)
+    private static InputFilter getFilter(final int base)
     {
          return new InputFilter() {
             @Override
@@ -161,4 +195,46 @@ public class MainActivity extends AppCompatActivity {
             }
         };
     }
+
+    private static String baseConvert(String num,int base1, int base2)
+    {
+        num = num.toUpperCase();
+        long decNum = 0;
+
+        //converts to decimal first
+        for(int i = 0; i < num.length(); i++ )
+        {
+            if (num.charAt(i) < 65)
+                decNum += (num.charAt(i) - 48)*(long)Math.pow(base1, num.length() - i - 1);
+
+            else
+                decNum += (num.charAt(i) - 55)*(long)Math.pow(base1, num.length() - i - 1);
+        }
+
+
+        char [] baseNum = new char[50];
+        int index = 0;
+
+
+        while(decNum != 0)
+        {
+            long temp = decNum % base2;
+
+            if(temp < 10)
+                baseNum[index] = (char) (temp + 48);
+            else
+                baseNum[index] = (char) (temp +55);
+
+            index++;
+            decNum /= base2;
+        }
+
+        String numConvert = "";
+
+        for(int i = index; i >= 0; i--)
+            numConvert += baseNum[i];
+
+        return numConvert;
+    }
+
 }
