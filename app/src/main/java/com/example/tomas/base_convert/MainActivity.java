@@ -5,8 +5,10 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -44,12 +46,13 @@ public class MainActivity extends AppCompatActivity {
                 base1 = Integer.parseInt(spinner1.getSelectedItem().toString());
 
                 if(base1 > 10)
-                    editText1.setInputType(InputType.TYPE_CLASS_TEXT);
+                    editText1.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
 
                 else
                     editText1.setInputType(InputType.TYPE_CLASS_NUMBER);
 
                 editText1.setFilters(new InputFilter[] {getFilter(base1)});
+                editText1.setText("");
 
             }
 
@@ -65,11 +68,12 @@ public class MainActivity extends AppCompatActivity {
 
                 base2 = Integer.parseInt(spinner2.getSelectedItem().toString());
                 if(base2 > 10)
-                    editText2.setInputType(InputType.TYPE_CLASS_TEXT);
+                    editText2.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
                 else
                     editText2.setInputType(InputType.TYPE_CLASS_NUMBER);
 
                 editText2.setFilters(new InputFilter[] {getFilter(base2)});
+                editText2.setText("");
 
             }
 
@@ -118,22 +122,42 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //function for adding input filter depending on base
     public static InputFilter getFilter(final int base)
     {
          return new InputFilter() {
             @Override
             public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-                for(int i = start; i < end; i++)
-                {
-                    char x = source.charAt(i);
 
-                    if(!Character.isDigit(x) && !(x >= 65 && x <= (65+base-11)) && !(x >= 97 && x <= (97+base-11))) {
+                if (source instanceof SpannableStringBuilder) {
+                    SpannableStringBuilder sourceAsSpannableBuilder = (SpannableStringBuilder)source;
+                    for (int i = end - 1; i >= start; i--) {
+                        char x = source.charAt(i);
 
-                        return "";
+                        if(base <= 10) {
+                            if(!(x >= 48 && x < (48+base)))
+                                sourceAsSpannableBuilder.delete(i, i+1);
+                        }
+                        else if (!Character.isDigit(x) && !(x >= 65 && x < (65+base-10)) && !(x >= 97 && x < (97+base-10))) {
+                            sourceAsSpannableBuilder.delete(i, i+1);
+                        }
                     }
-                }
+                    return source;
+                } else {
+                    StringBuilder filteredStringBuilder = new StringBuilder();
+                    for (int i = start; i < end; i++) {
+                        char x = source.charAt(i);
 
-                return null;
+                        if(base <= 10 ) {
+                            if(x >= 48 && x <= (48+base-1))
+                                filteredStringBuilder.append(x);
+                        }
+                        else if (Character.isDigit(x) || (x >= 65 && x < (65 + base - 10)) || (x >= 97 && x < (97 + base - 10))) {
+                            filteredStringBuilder.append(x);
+                        }
+                    }
+                    return filteredStringBuilder.toString();
+                }
             }
         };
     }

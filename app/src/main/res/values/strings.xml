@@ -4,6 +4,7 @@
     <string-array name = "bases">
         <item>2</item>
         <item>10</item>
+        <item>8</item>
         <item>16</item>
     </string-array>
 </resources>
